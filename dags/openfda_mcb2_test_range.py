@@ -66,15 +66,18 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-dag = DAG(
-    'fetch_openfda_data_monthly',
-    default_args=default_args,
-    description='Retrieve OpenFDA data monthly',
-    schedule_interval='@monthly',
-    start_date=datetime(2020, 11, 1),
-    catchup=True,
-    max_active_tasks=1
+@dag(
+    dag_id="openfda_mcb2_test_range",
+    schedule="@once",  # << antes era schedule_interval
+    start_date=pendulum.datetime(2025, 9, 23, tz="UTC"),
+    catchup=False,
+    max_active_runs=1,
+    tags=["openfda", "bigquery", "test", "range"],
 )
+def openfda_pipeline_test_range():
+    fetch_fixed_range_and_to_bq()
+
+dag = openfda_pipeline_test_range()
 
 
 fetch_data_task = PythonOperator(
@@ -92,6 +95,7 @@ save_data_task = PythonOperator(
 )
 
 fetch_data_task >> save_data_task
+
 
 
 
