@@ -7,7 +7,7 @@ import requests
 from datetime import date
 
 # Configurações
-GCP_PROJECT  = "365846072239"
+GCP_PROJECT  = "951374833974"
 BQ_DATASET   = "dataset_fda"
 BQ_TABLE     = "openfda_sildenafil_range_test"
 BQ_LOCATION  = "US"
@@ -76,3 +76,4 @@ def openfda_pipeline_test_range():
     fetch_fixed_range_and_to_bq()
 
 dag = openfda_pipeline_test_range()
+
