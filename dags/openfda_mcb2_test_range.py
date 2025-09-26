@@ -14,8 +14,8 @@ BQ_LOCATION  = "US"
 GCP_CONN_ID  = "google_cloud_default"
 USE_POOL     = True
 POOL_NAME    = "openfda_api"
-TEST_START = date(2025, 6, 1)
-TEST_END   = date(2025, 7, 29)
+TEST_START = date(2025, 1, 1)
+TEST_END   = date(2025, 12, 31)
 DRUG_QUERY = 'sildenafil+citrate'
 
 SESSION = requests.Session()
@@ -76,4 +76,5 @@ def openfda_pipeline_test_range():
     fetch_fixed_range_and_to_bq()
 
 dag = openfda_pipeline_test_range()
+
 
