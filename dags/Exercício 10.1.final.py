@@ -164,7 +164,7 @@ def fetch_tobacco_data_to_bq():
     )
 
 @dag(
-    dag_id="openfda_tobacco_reports_fixed2",
+    dag_id="openfda_tobacco_report",
     schedule="@once",
     start_date=pendulum.datetime(2025, 9, 23, tz="UTC"),
     catchup=False,
