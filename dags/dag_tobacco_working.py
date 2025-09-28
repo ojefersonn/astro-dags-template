@@ -43,45 +43,50 @@ if USE_POOL:
 
 @task(**_task_kwargs)
 def fetch_tobacco_data_to_bq():
-    url = _build_openfda_tobacco_url(TEST_START, TEST_END, TOBACCO_TERM)
-    print(f"🔍 URL: {url}")
-    
-    data = _openfda_get(url)
-    results = data.get("results", [])
-    
-    print(f"📊 Registros encontrados: {len(results)}")
-    
-    if not results:
-        print("⚠️ Nenhum resultado encontrado")
-        return
-    
-    # Processa dados tobacco (estrutura diferente!)
-    processed_data = []
-    
-    for record in results:
-        # Extrai dados do registro tobacco
-        processed_data.append({
-            "report_id": record.get("report_id", ""),
-            "date_submitted": record.get("date_submitted", ""),
-            "product_problems": str(record.get("reported_product_problems", [])),
-            "health_problems": str(record.get("reported_health_problems", [])),
-            "tobacco_products": str(record.get("tobacco_products", [])),
-            "product_search": TOBACCO_TERM
-        })
-    
-    df = pd.DataFrame(processed_data)
-    
-    # Converte data
-    df["date_submitted"] = pd.to_datetime(df["date_submitted"], format="%Y%m%d", errors='coerce', utc=True)
+    batch_size = 100
+    skip = 0
+    all_results = []
+    total = None
+
+    while total is None or skip < total:
+        url = (
+            f"https://api.fda.gov/tobacco/problem.json"
+            f"?search=tobacco_products.tobacco_product_name:{TOBACCO_TERM.replace(' ', '+')}"
+            f"+AND+date_submitted:[{TEST_START.strftime('%Y%m%d')}+TO+{TEST_END.strftime('%Y%m%d')}]"
+            f"&limit={batch_size}&skip={skip}"
+        )
+        for attempt in range(5):
+            response = SESSION.get(url, timeout=30)
+            if response.status_code == 429:
+                time.sleep(2 ** attempt)
+                continue
+            response.raise_for_status()
+            data = response.json()
+            break
+        else:
+            raise RuntimeError("Falha na API OpenFDA após várias tentativas")
+
+        if total is None:
+            total = data.get("meta", {}).get("results", {}).get("total", 0)
+        batch = data.get("results", [])
+        all_results.extend(batch)
+        skip += batch_size
+        time.sleep(1)
+
+    df = pd.DataFrame([{
+        "report_id": r.get("report_id", ""),
+        "date_submitted": r.get("date_submitted", ""),
+        "product_problems": str(r.get("reported_product_problems", [])),
+        "health_problems": str(r.get("reported_health_problems", [])),
+        "tobacco_products": str(r.get("tobacco_products", [])),
+        "product_search": TOBACCO_TERM
+    } for r in all_results])
+
+    df["date_submitted"] = pd.to_datetime(df["date_submitted"], format="%m/%d/%Y", errors="coerce", utc=True)
     df["win_start"] = pd.to_datetime(TEST_START)
     df["win_end"] = pd.to_datetime(TEST_END)
-    
-    print(f"✅ DataFrame criado: {df.shape}")
-    print(f"Colunas: {df.columns.tolist()}")
-    
-    # Grava no BigQuery
+
     bq_hook = BigQueryHook(gcp_conn_id=GCP_CONN_ID, location=BQ_LOCATION, use_legacy_sql=False)
-    
     df.to_gbq(
         destination_table=f"{BQ_DATASET}.{BQ_TABLE}",
         project_id=GCP_PROJECT,
