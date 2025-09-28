@@ -17,8 +17,8 @@ LOCALIZACAO_BQ = Variable.get("BIGQUERY_LOCATION", default_var="US")
 CONEXAO_GCP_ID = Variable.get("GCP_CONNECTION_ID", default_var="google_cloud_default")
 USAR_POOL     = Variable.get("USE_POOL", default_var=True, deserialize_json=True)
 NOME_POOL     = Variable.get("POOL_NAME", default_var="api_medicamentos_pool")
-DATA_INICIO   = Variable.get("START_DATE", default_var="2025-01-01")
-DATA_FIM      = Variable.get("END_DATE", default_var="2025-12-31")
+DATA_INICIO   = Variable.get("START_DATE", default_var="2025-06-01")
+DATA_FIM      = Variable.get("END_DATE", default_var="2025-06-30")
 MEDICAMENTO   = Variable.get("MEDICATION_QUERY", default_var="sildenafil+citrate")
 
 # Conversão de datas
