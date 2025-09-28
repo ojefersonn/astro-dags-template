@@ -68,7 +68,7 @@ def fetch_fixed_range_and_to_bq():
               location=BQ_LOCATION,
               progress_bar=False)
 
-@dag(dag_id="openfda_mcb2_tobacco_range",
+@dag(dag_id="Exercício 10.1",
      schedule="@once",
      start_date=pendulum.datetime(2025, 9, 23, tz="UTC"),
      catchup=False,
