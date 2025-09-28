@@ -3,6 +3,7 @@ from airflow.decorators import dag, task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 import pendulum
 import pandas as pd
+import time
 import requests
 from datetime import date
 
