@@ -42,7 +42,7 @@ _task_kwargs = dict(retries=0)
 if USE_POOL:
     _task_kwargs["pool"] = POOL_NAME
 
-@task(**_task_kwargs)
+@task(retries=0, pool=POOL_NAME if USE_POOL else None)
 def fetch_tobacco_data_to_bq():
     batch_size = 100
     skip = 0
@@ -51,19 +51,22 @@ def fetch_tobacco_data_to_bq():
 
     while total is None or skip < total:
         url = (
-            f"https://api.fda.gov/tobacco/problem.json"
+            "https://api.fda.gov/tobacco/problem.json"
             f"?search=tobacco_products.tobacco_product_name:{TOBACCO_TERM.replace(' ', '+')}"
             f"+AND+date_submitted:[{TEST_START.strftime('%Y%m%d')}+TO+{TEST_END.strftime('%Y%m%d')}]"
             f"&limit={batch_size}&skip={skip}"
         )
+
         for attempt in range(5):
-            response = SESSION.get(url, timeout=30)
-            if response.status_code == 429:
-                time.sleep(2 ** attempt)
-                continue
-            response.raise_for_status()
-            data = response.json()
-            break
+            try:
+                response = SESSION.get(url, timeout=30)
+                response.raise_for_status()
+                data = response.json()
+                break
+            except Exception as e:
+                wait = 2 ** attempt
+                print(f"Atenção: tentativa {attempt+1} falhou ({e}), aguardando {wait}s...")
+                time.sleep(wait)
         else:
             raise RuntimeError("Falha na API OpenFDA após várias tentativas")
 
