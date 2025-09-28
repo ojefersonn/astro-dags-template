@@ -79,7 +79,7 @@ def fetch_bitcoin_history_from_coingecko():
     df.to_sql("bitcoin_history", con=engine, if_exists="append", index=True)
 
 
-@dag(
+#@dag(
     default_args=DEFAULT_ARGS,
     schedule="0 0 * * *",  # diário à 00:00 UTC
     start_date=pendulum.datetime(2025, 9, 17, tz="UTC"),
