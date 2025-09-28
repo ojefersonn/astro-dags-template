@@ -101,7 +101,7 @@ def fetch_and_to_gbq():
 
     print(f"Loaded {len(df)} rows to {GCP_PROJECT}.{destination_table} (location={BQ_LOCATION}).")
 
-@dag(
+#@dag(
     default_args=DEFAULT_ARGS,
     schedule="0 0 * * *",  # daily at 00:00 UTC
     start_date=pendulum.datetime(2025, 9, 17, tz="UTC"),
