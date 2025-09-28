@@ -130,7 +130,13 @@ def processar_dados_periodo_fixo():
 
     print(f"Processados {len(df_eventos)} registros de eventos farmacêuticos")
 
+
+default_args = {
+    "owner": "Jeferson",
+}
+
 @dag(
+    default_args=default_args,
     dag_id="pipeline_analise_medicamentos_fda_v2",
     description="Pipeline para análise de eventos farmacêuticos via API FDA",
     schedule="@once",
