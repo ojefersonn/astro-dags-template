@@ -104,7 +104,7 @@ def fetch_tobacco_data_to_bq():
     print("🎉 Dados gravados no BigQuery com sucesso!")
 
 @dag(dag_id="openfda_tobacco_reports_fixed",
-     default_args="owner": "Jeferson",
+     default_args={"owner": "Jeferson"},
      schedule="@once",
      start_date=pendulum.datetime(2025, 9, 23, tz="UTC"),
      catchup=False,
