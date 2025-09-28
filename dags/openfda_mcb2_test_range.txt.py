@@ -66,7 +66,7 @@ def fetch_fixed_range_and_to_bq():
               location=BQ_LOCATION,
               progress_bar=False)
 
-#@dag(dag_id="openfda_mcb2_test_range",
+@dag(dag_id="openfda_mcb2_test_range",
      schedule="@once",
      start_date=pendulum.datetime(2025, 9, 23, tz="UTC"),
      catchup=False,
@@ -76,6 +76,7 @@ def openfda_pipeline_test_range():
     fetch_fixed_range_and_to_bq()
 
 dag = openfda_pipeline_test_range()
+
 
 
 
