@@ -1,4 +1,4 @@
-dfrom __future__ import annotations
+from __future__ import annotations
 from airflow.decorators import dag, task
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 import pendulum
